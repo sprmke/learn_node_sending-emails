@@ -100,7 +100,8 @@ exports.postSignup = (req, res, next) => {
           return user.save();
         })
         .then(async (result) => {
-          return await sendEmailWithEtherialService();
+          // return await sendEmailWithEtherialService();
+          return await sendEmailWithGmailService();
         })
         .then((result) => res.redirect('/login'));
     })
@@ -153,4 +154,37 @@ const sendEmailWithEtherialService = async () => {
   // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 
   return info;
+};
+
+const sendEmailWithGmailService = async () => {
+  let testAccount = await nodemailer.createTestAccount();
+  console.log(testAccount);
+
+  let mailTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'email@gmail.com',
+      // pass value should come from app password from your google account > security
+      pass: 'oslideheuvemjiym',
+    },
+  });
+
+  let mailDetails = {
+    from: 'email@gmail.com',
+    to: 'test.email@gmail.com',
+    subject: 'Test mail',
+    text: 'Node.js test mail',
+    html: '<h1>Hello world!</h1>',
+  };
+
+  return mailTransporter.sendMail(mailDetails, function (err, data) {
+    if (err) {
+      console.log('Error Occurs', err);
+    }
+
+    if (data) {
+      console.log('Email sent successfully');
+      console.log(data);
+    }
+  });
 };
