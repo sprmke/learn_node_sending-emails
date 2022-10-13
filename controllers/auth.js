@@ -100,8 +100,8 @@ exports.postSignup = (req, res, next) => {
           return user.save();
         })
         .then(async (result) => {
-          // return await sendEmailWithEtherialService();
           res.redirect('/login');
+          // return await sendEmailWithEtherialService();
           return await sendEmailWithGmailService();
         })
         .catch((err) => console.log(err));
