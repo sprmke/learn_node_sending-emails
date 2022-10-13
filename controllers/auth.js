@@ -101,9 +101,10 @@ exports.postSignup = (req, res, next) => {
         })
         .then(async (result) => {
           // return await sendEmailWithEtherialService();
+          res.redirect('/login');
           return await sendEmailWithGmailService();
         })
-        .then((result) => res.redirect('/login'));
+        .catch((err) => console.log(err));
     })
     .catch((err) => {
       console.log(err);
