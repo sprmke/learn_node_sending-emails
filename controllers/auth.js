@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 const User = require('../models/user');
 
 const getErrorMessage = (req) => {
@@ -98,6 +99,9 @@ exports.postSignup = (req, res, next) => {
 
           return user.save();
         })
+        .then(async (result) => {
+          return await sendEmailWithEtherialService();
+        })
         .then((result) => res.redirect('/login'));
     })
     .catch((err) => {
@@ -114,4 +118,39 @@ exports.postLogout = (req, res, next) => {
     console.log(err);
     res.redirect('/');
   });
+};
+
+const sendEmailWithEtherialService = async () => {
+  // Generate test SMTP service account from ethereal.email
+  // Only needed if you don't have a real mail account for testing
+  let testAccount = await nodemailer.createTestAccount();
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: testAccount.user, // generated ethereal user
+      pass: testAccount.pass, // generated ethereal password
+    },
+  });
+
+  // send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: '"Mike Cutie 👻" <mike@cutie.com>', // sender address
+    to: 'bojecof901@dicopto.com', // list of receivers
+    subject: 'Hello there! ✔', // Subject line
+    text: 'Hello world?', // plain text body
+    html: '<b>Hello world?</b>', // html body
+  });
+
+  console.log('Message sent: %s', info.messageId);
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+  // Preview only available when sending through an Ethereal account
+  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+
+  return info;
 };
